@@ -1,15 +1,38 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home.vue'
+import RegisterVocab from "@/views/RegisterVocab.vue";
+import PlayView from "@/views/PlayView.vue";
 
 Vue.use(VueRouter)
 
+export enum appRouter {
+  root="/",
+  home="/",
+  splash= "/splash",
+  register="/word/register",
+  play="/word/play"
+}
+
+ export const appRoutePush = (route:VueRouter,path:appRouter)=>{
+  route.push(path);
+}
 const routes: Array<RouteConfig> = [
   {
     path: '/',
     name: 'Home',
     component: Home
   },
+  {
+    path:appRouter.play,
+    name: 'Play',
+    component: PlayView
+  },{
+    path:appRouter.register,
+    name: 'register',
+    component: RegisterVocab
+  },
+
   {
     path: '/about',
     name: 'About',
