@@ -35,6 +35,9 @@ export default Vue.extend({
         definition:"Feeling",
         right:1,
         attempts:2,
+        pt:"Bom",
+        level:"1",
+        language:"German"
       }
       DataBase.insertInto<WordInterface>(TABLE_NAME.WORDS,word)
     },

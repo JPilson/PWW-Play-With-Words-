@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import Colors, {AppTheme} from "@/values/Colors";
 import Strings, {LanguageType} from "@/values/Strings";
+import {WordInterface} from "@/models/ModelInterface";
 
 export enum DataInterfaceType {
 
@@ -23,10 +24,17 @@ export default new Vuex.Store({
       colors:Colors[theme],
       strings:Strings.pt
     },
+    wordList:[] as Array<WordInterface>
   },
   mutations: {
+    updateWordList(state,payload:Array<WordInterface>){
+      state.wordList = payload
+    }
   },
   actions: {
+    updateWordList(context,payload){
+      context.commit("updateWordList",payload)
+    }
   },
   modules: {
   },
@@ -40,6 +48,10 @@ export default new Vuex.Store({
     isDark(state):boolean {
 
       return state.theme == AppTheme.dark
+    },
+    wordList(state):Array<WordInterface>{
+      return state.wordList
     }
+
   }
 })

@@ -4,15 +4,26 @@
  * JPilson Sumbo
  */
 
-export interface WordInterface {
+export interface WordInterface extends WordInterfaceDb{
+    pt?:string;
+    attempts?:number;
+    right?:number;
+
+}
+
+export enum LanguageList{
+    DEUTSCH = "deutsch",
+    ENGLISH = "english",
+    PORTUGUES = "portugues"
+
+}
+
+export interface WordInterfaceDb {
     id:string;
     level:string;
     word:string;
     english:string;
     definition:string;
-    pt:string;
-    attempts:number;
-    right:number;
     language:string;
 }
 
@@ -27,9 +38,10 @@ export interface UserInterface {
 
 export interface LanguageInterface {
     id:string;
-    title:string;
+    title:string ;
     english_title:string;
     country:string;
+
 
 
 }

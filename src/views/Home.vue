@@ -3,7 +3,7 @@
       <LinearLayout  :background-tint="color.dashCardColor" rounded-corners="10" class="px-2 pt-2"   >
         <v-flex class="d-flex flex-column  align-end justify-center mr-5" >
           <TextView text="Vocabular" size="12"/>
-          <TextView text="i262825"   style="transform: translateY(-10px) "
+          <TextView :text="$store.getters.wordList.length"   style="transform: translateY(-10px) "
                     color="white" size="12" bold/>
         </v-flex>
         <LinearLayout horizontal-orientation class="justify-space-around">
