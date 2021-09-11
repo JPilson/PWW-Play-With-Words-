@@ -4,6 +4,15 @@
  * JPilson Sumbo
  */
 
+export interface UserStats {
+    id:string | null,
+    stats: {
+        attempts:number,
+        right:number,
+        wrong:number
+    }
+}
+
 export interface WordInterface extends WordInterfaceDb{
     pt?:string;
     attempts?:number;
@@ -28,11 +37,12 @@ export interface WordInterfaceDb {
 }
 
 export interface UserInterface {
-    id:string;
+    id?:string;
     name:string;
     email:string;
     main_lg:string;
     age:number;
+    pwd:string
 
 }
 

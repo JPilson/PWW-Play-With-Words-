@@ -1,6 +1,5 @@
 import * as Faunadb from "faunaDb"
-import {errors} from "faunaDb";
-import BadRequest = errors.BadRequest;
+import {Collection, Documents, errors, Lambda, Select} from "faunaDb"
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('dotenv').config()
 
@@ -61,10 +60,22 @@ export default class FaunaDbHelper {
             throw Error(err)
         }
     }
-    async Get<T>(collection:DB_COLLECTION){
+
+    async Get<T>(collection:DB_COLLECTION,limit = 25,after?:string,before?:string):Promise<T>{
+        // Pagination options .. Size, after, before
+        const option:Record<string, string | number> = {}
+        option['size'] = limit
+        if(after)
+            option['after'] = after
+
+        if (before)
+            option['before'] = before
+
         const client = this.connect();
         const FQL  =  this.FQL
-        const data = await client.query(FQL.Get(collection));
+        return await client.query(FQL.Map(
+            FQL.Paginate(Documents(Collection(collection)),option),
+            Lambda((ref: string | number| boolean) => Select(['data'],FQL.Get(ref)))))
     }
 
 

@@ -1,9 +1,15 @@
 <template>
   <div class="pa-5 animated"   >
+    <LinearLayout rounded-corners="8" style="border: 1px solid black"  class="mb-5 px-10 stats-card pa-2  justify-sm-space-between align-center" horizontal-orientation space-between>
+      <div  v-for="(info, index) in userStats" :key="`stats_info${index}`">
+        <TextView :text="info.field" caps  size="12" :color="colors.primaryText"/>
+        <TextView :text="info.value" bold size="20" :color="colors.primaryText" />
+      </div>
+    </LinearLayout>
     <div  v-if="selectedWord">
       <LinearLayout ref="cardInfo" :background-tint="themes[selectedTheme].card" rounded-corners="20" pa="8"
                     :class="{'slide-right':slide}"
-                    style="min-height:200px" :style="modifier.shadow(0,20,30,themes[selectedTheme].accent,HexAA.P40)">
+                    style="min-height:200px" :style="modifier.shadow(0,0,30,'#0000',HexAA.P0)">
         <LinearLayout horizontal-orientation>
           <TextView text="What's the meaning?" transform="capitalize" size="12" :color="`#000000${HexAA.P50}`"/>
           <v-spacer/>
@@ -32,12 +38,14 @@
                       autocomplete="off"
 
         />
-        <vs-alert relief  color="danger" v-if="showAlert"> Not right :((
-
+        <vs-alert relief  color="danger" v-if="showAlert">
+          <div >
+            Not right :((
+          </div>
         </vs-alert>
       </div>
       <v-flex style="bottom:0;left:0; position: fixed; width: 100%;">
-        <v-btn :color="themes[selectedTheme].accent" :disabled="showAlert" block depressed x-large style="border-radius: 15px 15px 0 0" class="mr-5"
+        <v-btn min-height="60" :color="themes[selectedTheme].accent" :disabled="showAlert" block depressed x-large style="border-radius: 15px 15px 0 0" class="mr-5"
                @click="restartAnimation()">
           <TextView text="Next" caps bold color="black"/>
         </v-btn>
@@ -59,7 +67,9 @@ import {LanguageType} from "@/values/Strings";
 import LinearLayout from "@/utils/UI/LinearLayout/LinearLayout.vue";
 import Modifier from "@/values/Modifier";
 import Utils from "@/utils/Utils";
-import {LanguageList, WordInterface} from "@/models/ModelInterface";
+import {LanguageList, UserStats, WordInterface} from "@/models/ModelInterface";
+import APIPoint from "@/api/APIPoint";
+import {appRouter} from "@/router";
 
 
 
@@ -85,6 +95,12 @@ export default class PlayView extends Vue {
   public inputValue:string = ""
   public rule = []
   public showAlert:boolean = false
+
+  public statsInfo = [
+    {field:"attempts",icon:"",value:0},
+    {field:"Wrong",icon:"",value:0},
+    {field:"Right",icon:"",value:0},
+  ]
   
   
   
@@ -104,14 +120,19 @@ export default class PlayView extends Vue {
   }
   
   get wordList():Array<WordInterface>{
-    return (this.$store.getters.wordList as Array)
+    return (this.$store.getters.wordList as Array<WordInterface>)
+  }
+
+  get userStats ():[ Record<any, any>]{
+    return  this.$store.getters.userStats
+
   }
 
   checkResponse ():boolean{
     if(this.selectedWord.word === "No Word"){
-      return true
+      return false
     }
-    console.log(`Input ${this.inputValue}, English ${this.selectedWord.english} Deutsch ${this.selectedWord.word}`);
+    // console.log(`Input ${this.inputValue}, English ${this.selectedWord.english} Deutsch ${this.selectedWord.word}`);
       const word  = this.selectedWord.english.trim().toLocaleLowerCase()
     return word.includes(this.inputValue.trim().toLocaleLowerCase());
   }
@@ -132,16 +153,19 @@ export default class PlayView extends Vue {
     setTimeout(() => this.showAlert = false,2000)
   }
   restartAnimation():void{
+
     if(!this.checkResponse()) {
+      this.updatePoint(true)
       this.setAlert()
       return
     }
 
+    this.updatePoint(false)
     if(this.wordList.length  === 0)
       return
 
     this.selectedTheme = Utils.getRandomInt(this.themes.length)
-    this.wo
+    // this.wo
      this.slide = true
       setTimeout(()=>{
        this.slide = false
@@ -149,12 +173,33 @@ export default class PlayView extends Vue {
       },300)
 
   }
+  updatePoint(wrong:boolean):void{
+    this.$store.dispatch("updateUserStats",wrong)
+
+
+  }
+  async getWordsFromServer(): Promise<void> {
+        if(this.wordList.length < 1) {
+          const API = new APIPoint()
+         let data =  await  API.load<WordInterface>();
+         if(data['error']){
+           return
+         }
+        
+          this.$store.dispatch("updateWordList",data).then(()=>{
+            console.log(this.wordList)
+            this.selectWord()
+          })
+        }else {
+          this.selectWord()
+        }
+  }
   /**
    Life-Hook
    **/
   mounted():void {
-
-    this.restartAnimation()
+    this.getWordsFromServer()
+    // this.restartAnimation()
   }
 
   /** Methods & watchers
@@ -167,6 +212,10 @@ export default class PlayView extends Vue {
 </script>
 
 <style scoped lang="scss">
+
+.stats-card{
+    box-shadow: 5px 5px 0  black;
+}
 
   .animated{
 

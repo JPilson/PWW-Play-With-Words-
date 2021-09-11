@@ -4,12 +4,13 @@ import {openDB, deleteDB, wrap, unwrap, IDBPTransaction, StoreNames, IDBPDatabas
 export enum  TABLE_NAME {
     USERS = "users",
     WORDS ="words",
-    languages = "languages"
+    languages = "languages",
+    USER_STATS = "user_stats"
 }
 export default class DataBase {
 
     private static DB_NAME = "playWithWords";
-    private static VERSION = 1;
+    private static VERSION = 2;
 
 
 
@@ -29,10 +30,14 @@ export default class DataBase {
                         //
                         database.createObjectStore(TABLE_NAME.WORDS, {keyPath: 'word'})
                             .createIndex("word", "word", {unique: true});
+
                     } else if (newVersion === 2) {
                         // db.createObjectStore(DataBase.TABLE_USER,{keyPath:'id'})
                         //     .createIndex("id","id",{unique:true});
                         //
+                        database.createObjectStore(TABLE_NAME.USER_STATS, {keyPath:'id'})
+                            .createIndex("id","id",{unique:true});
+
                     } else if (newVersion === 3) {
 
                         //
@@ -71,14 +76,15 @@ export default class DataBase {
     }
 
 
-    static READ_FROM_DB(TABLE:TABLE_NAME,GET_BY:string,REFERENCE:string|number){
+    static READ_FROM_DB<T>(TABLE:TABLE_NAME,GET_BY:string,REFERENCE:string|number){
         return  openDB(this.DB_NAME,this.VERSION).then((db)=>{
+
             const transaction =  db.transaction(TABLE,"readonly").objectStore(TABLE);
             const queryIndex = transaction.index(GET_BY);
 
             return  queryIndex.openCursor(IDBKeyRange.only(REFERENCE)).then((result:any)=>{
-                // console.log("Result ",result);
-                return  result;
+
+                return  result as T;
             }).catch((error:Error) =>{
                 console.log(`Error on ${TABLE}` ,error);
                 return null;
