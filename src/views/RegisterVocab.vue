@@ -278,7 +278,6 @@ export default class RegisterVocab extends Vue {
         }
         onComplete(sheets as Array<never>);
 
-
       }
     } catch (e) {
       onError(e as never)

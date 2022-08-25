@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home.vue'
 import RegisterVocab from "@/views/RegisterVocab.vue";
 import PlayView from "@/views/PlayView.vue";
+import LoginView from "@/views/LoginView.vue";
 
 Vue.use(VueRouter)
 
@@ -20,6 +21,10 @@ export enum appRouter {
 const routes: Array<RouteConfig> = [
   {
     path: '/',
+    name: 'Login',
+    component: Home
+  },{
+    path: '/home',
     name: 'Home',
     component: Home
   },

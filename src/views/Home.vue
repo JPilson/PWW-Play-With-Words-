@@ -1,5 +1,5 @@
 <template>
-  <div class="home pa-5">
+  <div class="home pa-5" >
       <LinearLayout  :background-tint="color.dashCardColor" rounded-corners="10" class="px-2 pt-2"   >
         <v-flex class="d-flex flex-column  align-end justify-center mr-5" >
           <TextView text="Vocabular" size="12"/>
@@ -7,8 +7,8 @@
                     color="white" size="12" bold/>
         </v-flex>
         <LinearLayout horizontal-orientation class="justify-space-around">
-          <div v-for="(info, index) in dashBoardInfo" :key="`dash_info${index}`">
-            <TextView :text="info.field" bold/>
+          <div v-for="(info, index) in userStats" :key="`dash_info${index}`">
+            <TextView :text="info.field"  size = "12" color="white"/>
             <TextView :text="info.value" bold size="30" spacing="-2" style="transform: translateY(-10px) "
                       color="white"/>
           </div>
@@ -49,8 +49,7 @@ import {ColorType,HexAA} from "@/values/Colors";
 import TextView from "@/utils/UI/TextView/TextView.vue";
 import Modifier from "@/values/Modifier";
 import {appRouter} from "@/router";
-import Speech from "@/utils/Speech";
-import ApiRequest from "@/utils/Request/ApiRequest";
+import {UserStats} from "@/models/ModelInterface";
 
 
 @Component({
@@ -74,13 +73,15 @@ export default class Home extends Vue {
     return  this.$store.getters.colors
   }
 
+  get userStats ():[ Record<any, any>]{
+   return  this.$store.getters.userStats
+
+  }
+
   goTo(route:appRouter):void{
     this.$router.push(route)
   }
-  async mounted(): Promise<void> {
 
-
-  }
 
 
 
