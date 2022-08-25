@@ -1,19 +1,5 @@
 <template>
   <div :class="`pt-${pt}`" >
-    <div v-if="pullToRefresh" class="free-trigger-page">
-      <!--    <ToolBar :name="toolBarTitle" />-->
-      <EasyRefresh
-          ref="easyRefresh"
-          :userSelect="true"
-          :onRefresh="onRefresh"
-          :loadMore="loadMore"
-          :load-finished="loadFlag"
-          style="position: absolute"
-      >
-        <slot  ></slot>
-
-      </EasyRefresh>
-    </div>
     <div v-else class="free-trigger-page">
       <slot></slot>
     </div>
@@ -78,14 +64,7 @@ export default class LayoutContainer extends Vue {
   }
 
   // 刷新
-  private callRefresh() {
-    this.easyRefresh.callRefresh()
-  }
 
-  // 加载
-  private callLoadMore() {
-    this.easyRefresh.callLoadMore()
-  }
 
   mounted() {
     this.easyRefresh = this.$refs.easyRefresh as EasyRefresh

@@ -15,7 +15,7 @@ export enum appRouter {
 }
 
  export const appRoutePush = (route:VueRouter,path:appRouter)=>{
-  route.push(path);
+  return route.push(path)
 }
 const routes: Array<RouteConfig> = [
   {

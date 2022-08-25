@@ -7,5 +7,5 @@ export default class Values extends Vue {
     public test = 'Hello, hello, hello';
     // public colors: {} = Colors.light;
     // public strings: {} = Strings.pt
-    public assets: {} = Assets
+    public assets: Record<string, any> = Assets
 }

@@ -24,18 +24,25 @@ export default class FaunaDbHelper {
         return new Faunadb.Client({secret:process.env.FAUNA_SECRET!});
     }
 
-    async Create<T>(Collection:DB_COLLECTION, data:T,ref:string,client?:Faunadb.Client):Promise<Faunadb.Expr>{
+    async Create<T>(Collection:DB_COLLECTION, data:T,ref:string,client?:Faunadb.Client):Promise<{error:boolean;data:any}>{
         try {
             client = client ?? this.connect();
             const FQL  =  this.FQL
-            return await client.query(
+            const request =  await client.query(
                 FQL.Create(FQL.Ref(FQL.Collection(Collection), ref), {
                     data: data
                 })
             )
-        }catch (err:any){
+            return {
+                error:false,
+                data:request
+            }
+        }catch (err){
+            return {
+                error:true,
+                data:err.description
+            }
 
-            throw Error(err.description);
         }
     }
     Update<T>(Collection:DB_COLLECTION,ref:string,newData:T,client?:Faunadb.Client):Promise<Faunadb.Expr>{

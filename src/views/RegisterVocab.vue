@@ -43,16 +43,29 @@
       </LinearLayout>
     </LinearLayout>
     <div class="centered-item" >
-      <vs-dialog  v-model="selectionDialog">
+      <vs-dialog  v-model="selectionDialog" :loading="isRegistering" overflow-hidden prevent-close blur scroll>
         <template #header>
           <div>
             <TextView text="New Word!" bold size="30" :color="colors.primaryText"/>
             <TextView text="Expand your vocabulary" size="12" :color="colors.primaryText"/>
+            <LinearLayout horizontal-orientation  v-if="visibleView === 2">
+              <vs-button
+                  color="success"
+                  @click="saveWords(false)">
+                Use File
+              </vs-button>
+              <vs-button
+                  transparent
+                  @click="saveWords(true)">
+                Save Words
+              </vs-button>
+            </LinearLayout>
           </div>
         </template>
         <v-stepper class="elevation-0" :value="visibleView" :style="`-webkit-box-shadow: none; box-shadow: none;`">
 
           <v-stepper-items elevation-0>
+
             <v-stepper-content step="1" style="padding: 0!important;margin: 0!important">
               <LinearLayout @onClick="fileSelection" class="centered-item " pa="5" :background-tint="`#d6ffbc`" radius-bottom-left="10" radius-bottom-right="2" radius-top-left="15" radius-top-right="2"    >
                 <box-icon type="regular" name="file"   color="black"  />
@@ -65,19 +78,23 @@
             </v-stepper-content>
 
             <v-stepper-content step="2" style="padding: 0!important;margin: 0!important">
-            </v-stepper-content>
-              <LinearLayout >
-               <vs-button
-                transparent
-                @click="saveWords">
-                Save
-                </vs-button>
-                <LinearLayout @onClick="fileSelection" class="centered-item my-2 "  v-for="(word,index) in words" :key = "`w_i${index}`" pa="5" :background-tint="`#d6ffbc`" rounded-corners="15"    >
-                  <TextView :text="word.word" bold />
-                  <TextView :text="word.english"  />
-                </LinearLayout>
+              <LinearLayout @onClick="fileSelection" class="centered-item my-2 "  v-for="(word,index) in words" :key = "`w_i${index}`" pa="5" :background-tint="`#d6ffbc`" rounded-corners="15"    >
+                <TextView :text="word.word" bold />
+                <TextView :text="word.english"  />
+                <TextView :text="word.definition"  />
               </LinearLayout>
+            </v-stepper-content>
+            <v-stepper-content step="3" style="padding: 0!important;margin: 0!important">
+              <LinearLayout @onClick="fileSelection"  class="centered-item my-2 " pa="5" :background-tint="`#d6ffbc`" radius-bottom-left="10" radius-bottom-right="2" radius-top-left="15" radius-top-right="2"    >
+                <TextView text="Use File Data" />
+              </LinearLayout>
+              <LinearLayout @onClick="fileSelection" class="centered-item my-2 " pa="5" :background-tint="`#d6ffbc`" radius-bottom-left="10" radius-bottom-right="2" radius-top-left="15" radius-top-right="2"    >
+                <TextView text="Use Online Data" />
+              </LinearLayout>
+
+            </v-stepper-content>
           </v-stepper-items>
+
         </v-stepper>
 
       </vs-dialog>
@@ -99,6 +116,7 @@ import {appRouter} from "@/router";
 // import readXlsxFile from 'readXlsxFile'
 import * as XLSX from 'xlsx';
 import {LanguageList, WordInterface} from "@/models/ModelInterface";
+import ApiRequest, {ResponseInterface} from "@/utils/Request/ApiRequest";
 
 enum fieldType {
   word,
@@ -130,12 +148,13 @@ export default class RegisterVocab extends Vue {
   //VARIABLES DECLARATION HERE
   public visibleView = 1
   public selectionDialog = false
+  public isRegistering = false
   public modifier = Modifier
   public HexAA = HexAA
   public fileStructure:Record<string,FileStructure> = {
     word:{fieldName:"deutsch",description:"Deutsch Word",optional:false},
     translation:{fieldName:"Vokabeln",description:"English Translation Field",optional:false},
-    tip:{fieldName:"",description:"Tip of the Word or Definition",optional:true}
+    tip:{fieldName:"definition",description:"Tip of the Word or Definition",optional:true}
   }
 
   // public words:Collections.Set<WordInterface> = new Collections.Set();
@@ -173,12 +192,40 @@ export default class RegisterVocab extends Vue {
     // })
   }
    fileSelection():void{
-     (this.$refs.fileInput as Vue).click()
+     (this.$refs.fileInput as Vue & { click: () => void }).click()
   }
-  saveWords():void{
-    this.$store.dispatch("updateWordList",this.words).then(()=>{
-      this.goTo(appRouter.play)
-    })
+  async saveWords(saveOnline:boolean = false): Promise<void>{
+    let words:Array<WordInterface> ;
+    try {
+      if(saveOnline){
+         words = []
+        this.isRegistering = true
+        for (const element of this.words) {
+          const query = new FormData();
+          query.append("english", element.english)
+          const response = await new ApiRequest().request("post", ApiRequest.REGISTER_WORD, element) as ResponseInterface<WordInterface>
+          if(!response.error){
+            words.push(response.data)
+          }
+        }
+
+
+      }else{
+        words = this.words
+      }
+
+      setTimeout(() => {
+        this.isRegistering = false
+        this.$store.dispatch("updateWordList",words).then(()=>{
+          this.goTo(appRouter.play)
+        })
+      }, 1500)
+
+    } catch (e) {
+       console.log(e);
+    }finally {
+      this.isRegistering = false
+    }
 
   }
   async onFileSelected (event:any): Promise<void> {
@@ -198,7 +245,7 @@ export default class RegisterVocab extends Vue {
             language:LanguageList.DEUTSCH,
             id:"0",
             level:"1",
-            definition:row[this.fileStructure.tip.fieldName]
+            definition:row[this.fileStructure.tip.fieldName] ?? row[this.fileStructure.translation.fieldName]
 
           }
           if(word.word){

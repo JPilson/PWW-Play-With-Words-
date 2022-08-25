@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
 /dist
+/apps/node_modules
 
 
 # local env files
@@ -21,3 +22,23 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Cordova
+/apps/platforms
+/apps/plugins
+/public/cordova.js
+
+# Cordova
+/apps/platforms
+/apps/plugins
+/public/cordova.js
+
+# Cordova
+/apps/platforms
+/apps/plugins
+/public/cordova.js
+
+# Cordova
+/apps/platforms
+/apps/plugins
+/public/cordova.js

@@ -49,6 +49,8 @@ import {ColorType,HexAA} from "@/values/Colors";
 import TextView from "@/utils/UI/TextView/TextView.vue";
 import Modifier from "@/values/Modifier";
 import {appRouter} from "@/router";
+import Speech from "@/utils/Speech";
+import ApiRequest from "@/utils/Request/ApiRequest";
 
 
 @Component({
@@ -74,6 +76,10 @@ export default class Home extends Vue {
 
   goTo(route:appRouter):void{
     this.$router.push(route)
+  }
+  async mounted(): Promise<void> {
+
+
   }
 
 

@@ -9,10 +9,17 @@
           <v-spacer/>
           <TextView text="Deutsch" transform="capitalize" size="12" :color="`#000000${HexAA.P50}`"/>
         </LinearLayout>
-        <TextView :text="selectedWord.word" bold size="30" class="my-3 text-wrap " style="  overflow: auto;"/>
-        <TextView :text="selectedWord.definition || selectedWord.english" size="12" line-spacing="2"
+        <TextView :text="reverseLanguage?selectedWord.english : selectedWord.word" bold size="30" class="my-3 text-wrap " style="  overflow: auto;"/>
+        <TextView :text="selectedWord.definition || reverseLanguage?selectedWord.word : selectedWord.english" size="12" line-spacing="2"
                   :class="{'hidden-tip':!showTip}"/>
         <LinearLayout horizontal-orientation class="justify-end mt-4">
+          <div class="mx-2">
+            <vs-button :active="reverseLanguage" :color="`#ffffff`" depressed small
+                       @click="reverseLanguage = !reverseLanguage">
+              <box-icon type="regular" name="shuffle" color="black"/>
+            </vs-button>
+          </div>
+
           <v-btn fab :color="themes[selectedTheme].accent" depressed small @click="viewTip()">
             <box-icon type="regular" name="message-square-error" color="black"/>
           </v-btn>
@@ -53,7 +60,6 @@
 import Vue from "vue"
 import Component from "vue-class-component";
 import TextView from "@/utils/UI/TextView/TextView.vue";
-import Constants from '@/values/Constants';
 import {ColorType,HexAA} from "@/values/Colors";
 import {LanguageType} from "@/values/Strings";
 import LinearLayout from "@/utils/UI/LinearLayout/LinearLayout.vue";
@@ -74,6 +80,7 @@ export default class PlayView extends Vue {
   public selectedTheme:number = 5
   public slide = false
   public showTip = false
+  public reverseLanguage = false
   public selectedWord:WordInterface =  {
     word : "No Word",
     english : "Add Word to Play",
@@ -104,15 +111,15 @@ export default class PlayView extends Vue {
   }
   
   get wordList():Array<WordInterface>{
-    return (this.$store.getters.wordList as Array)
+    return (this.$store.getters.wordList as [])
   }
 
   checkResponse ():boolean{
     if(this.selectedWord.word === "No Word"){
       return true
     }
-    console.log(`Input ${this.inputValue}, English ${this.selectedWord.english} Deutsch ${this.selectedWord.word}`);
-      const word  = this.selectedWord.english.trim().toLocaleLowerCase()
+
+    const word  = this.reverseLanguage ? this.selectedWord.word.trim().toLocaleLowerCase() :  this.selectedWord.english.trim().toLocaleLowerCase()
     return word.includes(this.inputValue.trim().toLocaleLowerCase());
   }
 
@@ -141,7 +148,7 @@ export default class PlayView extends Vue {
       return
 
     this.selectedTheme = Utils.getRandomInt(this.themes.length)
-    this.wo
+
      this.slide = true
       setTimeout(()=>{
        this.slide = false

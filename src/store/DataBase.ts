@@ -17,7 +17,7 @@ export default class DataBase {
 
     }
 
-    static async openDb() {
+    static async openDb():Promise<void> {
 
         try {
                  console.log("Oba");
@@ -58,7 +58,7 @@ export default class DataBase {
     }
 
 
-    static  async insertInto<T>(TABLE:TABLE_NAME,VALUE:T){
+    static  async insertInto<T>(TABLE:TABLE_NAME,VALUE:T):Promise<void>{
         openDB(this.DB_NAME,this.VERSION).then((db)=>{
             db.transaction([TABLE],"readwrite")
                 .objectStore(TABLE).put(VALUE).catch((error:Error) =>{
@@ -71,7 +71,7 @@ export default class DataBase {
     }
 
 
-    static READ_FROM_DB(TABLE:TABLE_NAME,GET_BY:string,REFERENCE:string|number){
+    static READ_FROM_DB<T>(TABLE:TABLE_NAME,GET_BY:string,REFERENCE:string|number):Promise<T>{
         return  openDB(this.DB_NAME,this.VERSION).then((db)=>{
             const transaction =  db.transaction(TABLE,"readonly").objectStore(TABLE);
             const queryIndex = transaction.index(GET_BY);

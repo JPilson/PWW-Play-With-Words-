@@ -18,9 +18,9 @@ export default class Modifier {
         return ` box-shadow:${x}px ${y}px ${blur}px ${color}${opacity??HexAA.P100}`;
     }
 
-    public static padding = ()=>{
-        return ``
-    }
+    // public static padding = ()=>{
+    //     return ``
+    // }
 
     constructor() {
 
